@@ -1,0 +1,54 @@
+server {
+
+        root /var/www/d9.wtf/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name d9.wtf www.d9.wtf;
+
+	location / {
+		proxy_http_version 1.1;
+		proxy_cache_bypass $http_upgrade;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection '';
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		add_header 'Access-Control-Allow_Origin' '*';
+		proxy_set_header 'Access-Control-Allow_Origin' '*';
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_pass http://localhost:3030;
+		proxy_buffering off;
+		proxy_cache off;
+		chunked_transfer_encoding off;
+	}
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/d9.wtf/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/d9.wtf/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+server {
+    if ($host = www.d9.wtf) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = d9.wtf) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+        listen 80;
+        listen [::]:80;
+
+        server_name d9.wtf www.d9.wtf;
+    return 404; # managed by Certbot
+
+
+
+
+}
